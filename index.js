@@ -7,13 +7,14 @@ const bodyParser = require("express");
 const axios = require("axios").default;
 
 
+
 const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
         cors: {
-            origin: ["http://localhost:5000", "http://10.0.0.9:5000", "https://www.isolaatti.com"],
+            origin: ["http://localhost:5000", "http://10.0.0.9", "https://www.isolaatti.com"],
             credentials: true
         }
     }
@@ -21,7 +22,7 @@ const io = new Server(httpServer, {
 
 io.use((socket, next) => {
     const token = socket.handshake.auth.sessionToken;
-    console.log(token);
+    // console.log(token);
     // Make authentication against Isolaatti backend
     axios.request({
         url:`${ISOLAATTI_BACKEND_SERVER}/api/LogIn/Verify`,
@@ -39,12 +40,14 @@ io.use((socket, next) => {
                 socket.join(`${scopeData.type}-${scopeData.id}`);
             });
             next();
-            console.log("Successful authentication");
+            // console.log("Successful authentication");
         } else {
             next({message: "Authentication failed, invalid token", data: authResult});
         }
 
-    });
+    }).catch(error => {
+        console.error(error);
+    })
 
 });
 
@@ -80,9 +83,11 @@ app.post("/update_event", async (req, res) => {
         res.send({status: "invalid"});
     }
     const updateEventData = payload.eventData;
-    io.to(`${updateEventData.type}-${updateEventData.id}`).emit("post-update",updateEventData.data);
+    io.to(`${updateEventData.type}-${updateEventData.id}`).emit(updateEventData.type,updateEventData.data);
     console.log(`evento emitido ${updateEventData.type}-${updateEventData.id}`, );
+    console.log(updateEventData.data);
     res.send();
 });
 
 httpServer.listen(3000);
+console.log("Servidor corriendo...");
