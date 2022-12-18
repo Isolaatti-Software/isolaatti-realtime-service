@@ -1,4 +1,7 @@
-const ISOLAATTI_BACKEND_SERVER = "http://localhost:5000";
+
+
+const ISOLAATTI_BACKEND_SERVER = process.env.backend ? "https://isolaatti.azurewebsites.net" : "http://localhost:5000";
+console.log(process.env.backend);
 
 const express = require("express");
 const { createServer } = require("http");
@@ -14,7 +17,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
         cors: {
-            origin: ["http://localhost:5000", "http://10.0.0.9", "https://www.isolaatti.com"],
+            origin: ["http://localhost:5000", "https://backend.isolaatti.com"],
             credentials: true
         }
     }
@@ -90,4 +93,5 @@ app.post("/update_event", async (req, res) => {
 });
 
 httpServer.listen(3000);
+console.log("Servidor corriendo...");
 console.log("Servidor corriendo...");
