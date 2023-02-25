@@ -1,6 +1,6 @@
 
 
-const ISOLAATTI_BACKEND_SERVER = process.env.backend ? "https://isolaatti.azurewebsites.net" : "http://localhost:5000";
+const ISOLAATTI_BACKEND_SERVER = process.env.backend ? "https://isolaatti.com" : "http://localhost:5000";
 console.log(process.env.backend);
 
 const express = require("express");
