@@ -17,7 +17,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
         cors: {
-            origin: ["http://localhost:5000", "https://backend.isolaatti.com"],
+            origin: ["http://localhost:5000", "https://isolaatti.com"],
             credentials: true
         }
     }
