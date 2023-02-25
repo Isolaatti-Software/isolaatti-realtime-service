@@ -86,7 +86,7 @@ app.post("/update_event", async (req, res) => {
         res.send({status: "invalid"});
     }
     const updateEventData = payload.eventData;
-    io.to(`${updateEventData.type}-${updateEventData.id}`).emit(updateEventData.type,updateEventData.data);
+    io.to(`${updateEventData.type}-${updateEventData.id}`).emit(updateEventData.type,updateEventData.id,updateEventData.data);
     console.log(`evento emitido ${updateEventData.type}-${updateEventData.id}`, );
     console.log(updateEventData.data);
     res.send();
