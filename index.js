@@ -1,7 +1,7 @@
 
 
 const ISOLAATTI_BACKEND_SERVER = process.env.backend ? "https://isolaatti.com" : "http://localhost:5000";
-console.log(process.env.backend);
+console.log("Backend production: " + process.env.backend);
 
 const express = require("express");
 const { createServer } = require("http");
@@ -17,7 +17,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
         cors: {
-            origin: ["http://localhost:5000", "https://isolaatti.com"],
+            origin: ["http://localhost:5000", "https://isolaatti.com", "http://10.0.0.17:5000"],
             credentials: true
         }
     }
@@ -80,18 +80,19 @@ app.post("/send_notification", async (req, res) => {
    res.send();
 });
 
-app.post("/update_event", async (req, res) => {
+app.post("/event", async (req, res) => {
     const payload = req.body;
     if(!await validateRemoteKey(payload.secret)){
         res.send({status: "invalid"});
     }
-    const updateEventData = payload.eventData;
-    io.to(`${updateEventData.type}-${updateEventData.id}`).emit(updateEventData.type,updateEventData.id,updateEventData.data);
-    console.log(`evento emitido ${updateEventData.type}-${updateEventData.id}`, );
-    console.log(updateEventData.data);
+    const eventData = payload.eventData;
+    const roomName = `${eventData.type}-${eventData.relatedId}`;
+    io.to(roomName).emit(eventData.type, eventData.clientId, eventData.relatedId, eventData.payload);
+    if(process.env.backend === undefined){
+        console.log(eventData);
+    }
     res.send();
 });
 
 httpServer.listen(3000);
-console.log("Servidor corriendo...");
-console.log("Servidor corriendo...");
+console.log("Listening on port 3000");
