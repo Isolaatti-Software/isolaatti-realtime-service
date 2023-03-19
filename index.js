@@ -3,13 +3,21 @@
 const ISOLAATTI_BACKEND_SERVER = process.env.backend ? "https://isolaatti.com" : "http://localhost:5000";
 console.log("Backend production: " + process.env.backend);
 
+const SECRET_HASH = process.env.secret_hash !== undefined 
+    ? process.env.hash 
+    // This is the hash for "password", that`s the secret that should be used during development. If
+    // another secret is going to be used, then define an environment variable called "secret_hash" or
+    // change the line below.
+    // To generate a new hash, use bcrypt library with saltRounds = 10
+    : "$2b$10$VDxk.r70kAN6pHjtDRVOOOJKm950QtaEZ9.ss9g6cTrF8U6S5rYIS";
+
+
 const express = require("express");
 const { createServer } = require("http");
 const { Server } = require("socket.io");
 const bodyParser = require("express");
 const axios = require("axios").default;
-
-
+const bcrypt = require('bcrypt');
 
 const app = express();
 app.use(bodyParser.json());
@@ -54,24 +62,13 @@ io.use((socket, next) => {
 
 });
 
-async function validateRemoteKey(key){
-    const response = await axios.request({
-        url: `${ISOLAATTI_BACKEND_SERVER}/realtime-service/verify-key`,
-        method: "POST",
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        data: {
-            key: key
-        }
-    });
-
-    return response.status === 200;
+async function validateSecret(key){
+    return bcrypt.compare(key, SECRET_HASH)
 }
 
 app.post("/send_notification", async (req, res) => {
    const payload = req.body;
-   if(!await validateRemoteKey(payload.secret)){
+   if(!await validateSecret(payload.secret)){
        res.send({status: "invalid"});
    }
 
@@ -82,7 +79,7 @@ app.post("/send_notification", async (req, res) => {
 
 app.post("/event", async (req, res) => {
     const payload = req.body;
-    if(!await validateRemoteKey(payload.secret)){
+    if(!await validateSecret(payload.secret)){
         res.send({status: "invalid"});
     }
     const eventData = payload.eventData;
