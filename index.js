@@ -32,7 +32,8 @@ const io = new Server(httpServer, {
 );
 
 io.use((socket, next) => {
-    const token = socket.handshake.auth.sessionToken;
+    const token = socket.handshake.auth.authorization;
+    const clientId = socket.handshake.auth.clientId;
     // console.log(token);
     // Make authentication against Isolaatti backend
     axios.request({
