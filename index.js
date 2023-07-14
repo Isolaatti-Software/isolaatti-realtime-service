@@ -7,7 +7,7 @@ console.log("Backend: " + ISOLAATTI_BACKEND_SERVER);
 console.log("Is Production: " + isProduction);
 
 const SECRET_HASH = process.env.secret_hash !== undefined 
-    ? process.env.hash 
+    ? process.env.secret_hash 
     // This is the hash for "password", that`s the secret that should be used during development. If
     // another secret is going to be used, then define an environment variable called "secret_hash" or
     // change the line below.
