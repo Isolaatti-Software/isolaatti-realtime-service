@@ -1,7 +1,7 @@
 
 
 const ISOLAATTI_BACKEND_SERVER = process.env.backend ? process.env.backend : "http://localhost:5000";
-const isProduction = process.env.env ?? false;
+const isProduction = process.env.env === "production" ?? false;
 const postgresPwd = process.env.postgrespwd;
 console.log("Backend: " + ISOLAATTI_BACKEND_SERVER);
 console.log("Is Production: " + isProduction);
