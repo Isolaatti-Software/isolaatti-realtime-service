@@ -1,7 +1,10 @@
 
 
-const ISOLAATTI_BACKEND_SERVER = process.env.backend ? "https://isolaatti.com" : "http://localhost:5000";
-console.log("Backend production: " + process.env.backend);
+const ISOLAATTI_BACKEND_SERVER = process.env.backend ? process.env.backend : "http://localhost:5000";
+const isProduction = process.env.env ?? false;
+const postgresPwd = process.env.postgrespwd;
+console.log("Backend: " + ISOLAATTI_BACKEND_SERVER);
+console.log("Is Production: " + isProduction);
 
 const SECRET_HASH = process.env.secret_hash !== undefined 
     ? process.env.hash 
@@ -18,6 +21,7 @@ const { Server } = require("socket.io");
 const bodyParser = require("express");
 const axios = require("axios").default;
 const bcrypt = require('bcrypt');
+const { createAdapter, PostgresAdapter } = require("@socket.io/postgres-adapter");
 
 const app = express();
 app.use(bodyParser.json());
@@ -25,7 +29,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
         cors: {
-            origin: ["http://localhost:5000", "https://isolaatti.com", "http://10.0.0.17:5000"],
+            origin: ["http://localhost:5000", "http://127.0.0.1:5000", "https://isolaatti.com", "http://10.0.0.17:5000"],
             credentials: true
         }
     }
@@ -91,6 +95,20 @@ app.post("/event", async (req, res) => {
     }
     res.send();
 });
+
+if(isProduction) {
+    const pool = new Pool({
+        user: "app",
+        host: "10.116.0.3",
+        database: "socketio",
+        password: postgresPwd,
+        port: 5432,
+      });
+    
+    io.adapter(createAdapter(pool));
+}
+
+
 
 httpServer.listen(3000);
 console.log("Listening on port 3000");
