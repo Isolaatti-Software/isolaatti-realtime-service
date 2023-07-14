@@ -105,6 +105,13 @@ if(isProduction) {
         password: postgresPwd,
         port: 5432,
       });
+
+    pool.query(`
+      CREATE TABLE IF NOT EXISTS socket_io_attachments (
+          id          bigserial UNIQUE,
+          created_at  timestamptz DEFAULT NOW(),
+          payload     bytea
+      );`);
     
     io.adapter(createAdapter(pool));
 }
