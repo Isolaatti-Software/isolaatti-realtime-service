@@ -22,6 +22,7 @@ const bodyParser = require("express");
 const axios = require("axios").default;
 const bcrypt = require('bcrypt');
 const { createAdapter, PostgresAdapter } = require("@socket.io/postgres-adapter");
+const { Pool } = require("pg");
 
 const app = express();
 app.use(bodyParser.json());
